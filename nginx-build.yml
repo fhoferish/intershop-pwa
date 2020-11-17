@@ -1,0 +1,29 @@
+trigger:
+  branches:
+    include:
+      - master
+      - develop
+
+  paths:
+    include:
+      - nginx/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  projectName: 'intershop-pwa-nginx-$(Build.SourceBranchName)'
+
+  registryServerName: $(registryName).azurecr.io
+  imageName: '$(projectName)'
+
+
+steps:
+  - bash: |
+      docker build -f $(system.defaultWorkingDirectory)/nginx/Dockerfile -t $(registryServerName)/$(imageName):$(build.buildId) $(system.defaultWorkingDirectory)/nginx --build-arg displayVersion=$(build.buildId)
+    displayName: 'docker build'
+
+  - bash: |
+      docker login $(registryServerName) -u $(registryLogin) -p $(registryPassword)
+      docker push $(registryServerName)/$(imageName):$(build.buildId)
+    displayName: 'docker push'
