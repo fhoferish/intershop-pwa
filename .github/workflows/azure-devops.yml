@@ -1,10 +1,10 @@
-name: Synchronize develop branch
+name: Synchronize chore/add-azure-pipelines branch
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - develop
+      - chore/add-azure-pipelines
 
 jobs:
   CancelPrevious:
@@ -26,6 +26,8 @@ jobs:
           # Fullyqualified URL to the Azure DevOps organization along with project name(eg, https://dev.azure.com/organization/project-name or https://server.example.com:8080/tfs/DefaultCollection/project-name)
           azure-devops-project-url: https://dev.azure.com/ish-pwa-rngrx/intershop-pwa
           # Name of the Azure Pipline to be triggered
-          azure-pipeline-name: Sync
+          azure-pipeline-name: Sync-add-azure-pipelines
           # Paste personal access token of the user as value of secret variable:AZURE_DEVOPS_TOKEN
           azure-devops-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}
+          # Variables used in Sync pipeline - not released yet
+          # azure-pipeline-variables: '{"branch": "chore/add-azure-pipelines"}'
