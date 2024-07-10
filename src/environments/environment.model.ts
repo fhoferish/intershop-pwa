@@ -50,6 +50,7 @@ export interface Environment {
     | 'tracking'
     | 'tacton'
     | 'maps'
+    | 'copilot'
   )[];
 
   /* ADDITIONAL FEATURE CONFIGURATIONS */
@@ -140,6 +141,12 @@ export interface Environment {
    * - 'stable': only fetch prices once per application lifetime
    */
   priceUpdate: 'stable' | 'always';
+
+  copilotConfig?: {
+    chatflowid: string;
+    apiHost: string;
+    cdnLink: string;
+  };
 }
 
 export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
@@ -158,6 +165,7 @@ export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
     'recently',
     'saveLanguageSelection',
     'storeLocator',
+    'copilot',
   ],
 
   /* PROGRESSIVE WEB APP CONFIGURATIONS */
@@ -213,4 +221,10 @@ export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
     tacton: 'forever',
   },
   priceUpdate: 'always',
+
+  copilotConfig: {
+    chatflowid: 'df4837d3-bb4b-4395-abb3-0a92419a13e4',
+    apiHost: 'https://ish-flowise-app.azurewebsites.net',
+    cdnLink: 'https://cdn.jsdelivr.net/gh/714Lemons/FlowiseChatEmbed@demo/dist/web.js',
+  },
 };
