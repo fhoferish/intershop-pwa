@@ -32,6 +32,9 @@ export class CopilotComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   copilotToolCall$: Observable<string>;
 
+  restEndpoint$: Observable<string>;
+  locale = 'en_US';
+
   constructor(
     rendererFactory: RendererFactory2,
     @Inject(DOCUMENT) private document: Document,
@@ -60,7 +63,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handleToolCall(toolCall: any) {
+  private async handleToolCall(toolCall: any) {
     switch (toolCall?.tool) {
       case 'product_search':
         this.navigate(`/search/${toolCall?.toolInput?.Queries}`);
@@ -80,15 +83,30 @@ export class CopilotComponent implements OnInit, OnDestroy {
         this.handleCompareProducts(toolCall?.toolInput?.SKUs);
         break;
       case 'add_product_to_basket':
-        this.ngZone.run(() => {
+        this.ngZone.run(async () => {
           const skus = toolCall?.toolInput.Products.split(';');
           skus.forEach((sku: string) => {
             this.shoppingFacade.addProductToBasket(sku, 1);
           });
         });
+        break;
       default:
         break;
     }
+  }
+
+  private async getRestEndpoint() {
+    const locale = await this.copilotFacade.getCurrentLocale();
+    const currency = await this.copilotFacade.getCurrentCurrency();
+    const restEndpoint = await this.copilotFacade.getRestEndpoint();
+
+    // if locale or currency is not available, use defaults en_US and curr=USD
+    if (!locale || !currency) {
+      return `${restEndpoint};loc=en_US;cur=USD`;
+    }
+
+    this.locale = locale;
+    return `${restEndpoint};loc=${locale};cur=${currency}`;
   }
 
   private handleCompareProducts(skuString: string) {
@@ -115,10 +133,20 @@ export class CopilotComponent implements OnInit, OnDestroy {
     return this.ngZone.run(() => this.router.navigateByUrl(url));
   }
 
-  private initializeCopilot() {
+  private async initializeCopilot() {
     if (!SSR && this.featureToggleService.enabled('copilot')) {
+      const customer = await this.copilotFacade.getCustomerState();
+      const restEndpoint = await this.getRestEndpoint();
       const script = this.renderer.createElement('script');
       script.type = 'module';
+
+      // create different welcome message based on the locale: en_US, de_DE, fr_FR
+      let welcomeMessage = 'Welcome! How can I assist you today?';
+      if (this.locale === 'de_DE') {
+        welcomeMessage = 'Willkommen! Wie kann ich Ihnen heute helfen?';
+      } else if (this.locale === 'fr_FR') {
+        welcomeMessage = "Bienvenue! Comment puis-je vous aider aujourd'hui?";
+      }
 
       script.text = `
         (async () => {
@@ -128,8 +156,9 @@ export class CopilotComponent implements OnInit, OnDestroy {
             apiHost: "${this.copilotSettings.apiHost}",
             chatflowConfig: {
               vars: {
-                search_engine_url: "123",
-                customer_id: "123",
+                customer: ${JSON.stringify(customer)},
+                restEndpoint: "${restEndpoint}",
+                locale: "${this.locale}",
               },
             },
             observersConfig: {
@@ -145,7 +174,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
                 showTitle: true,
                 showAgentMessages: true,
                 title: 'inSPIRED Assistant',
-                welcomeMessage: 'Welcome! How can I assist you today?',
+                welcomeMessage: '${welcomeMessage}',
                 backgroundColor: '#f8f9fa',
                 height: 700,
                 fontSize: 13,
