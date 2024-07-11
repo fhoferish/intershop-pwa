@@ -14,6 +14,7 @@ import { Observable, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 import { COPILOT_SETTINGS } from 'ish-core/configurations/injection-keys';
+import { ShoppingFacade } from 'ish-core/facades/shopping.facade';
 import { FeatureToggleService } from 'ish-core/feature-toggle.module';
 import { InjectSingle } from 'ish-core/utils/injection';
 
@@ -39,7 +40,8 @@ export class CopilotComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     private router: Router,
     private copilotFacade: CopilotFacade,
-    private compareFacade: CompareFacade
+    private compareFacade: CompareFacade,
+    private shoppingFacade: ShoppingFacade
   ) {
     this.renderer = rendererFactory.createRenderer(undefined, undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,9 +68,6 @@ export class CopilotComponent implements OnInit, OnDestroy {
       case 'product_detail_page':
         this.navigate(`/product/${toolCall?.toolInput?.SKU}`);
         break;
-      case 'add_product_to_basket':
-        window.location.reload();
-        break;
       case 'get_product_variations':
         this.navigate(`/product/${toolCall?.toolInput?.SKU}`);
         break;
@@ -80,6 +79,13 @@ export class CopilotComponent implements OnInit, OnDestroy {
       case 'compare_products':
         this.handleCompareProducts(toolCall?.toolInput?.SKUs);
         break;
+      case 'add_product_to_basket':
+        this.ngZone.run(() => {
+          const skus = toolCall?.toolInput.Products.split(';');
+          skus.forEach((sku: string) => {
+            this.shoppingFacade.addProductToBasket(sku, 1);
+          });
+        });
       default:
         break;
     }
@@ -120,6 +126,12 @@ export class CopilotComponent implements OnInit, OnDestroy {
           Chatbot.init({
             chatflowid: "${this.copilotSettings.chatflowid}",
             apiHost: "${this.copilotSettings.apiHost}",
+            chatflowConfig: {
+              vars: {
+                search_engine_url: "123",
+                customer_id: "123",
+              },
+            },
             observersConfig: {
               observeToolCall: toolCall => {
                 window.handleToolCall(toolCall); // This will now work

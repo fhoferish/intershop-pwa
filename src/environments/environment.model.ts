@@ -223,7 +223,7 @@ export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
   priceUpdate: 'always',
 
   copilotConfig: {
-    chatflowid: 'df4837d3-bb4b-4395-abb3-0a92419a13e4',
+    chatflowid: '3ae443a9-b15f-4eca-a23c-8b496b7bbddf',
     apiHost: 'https://ish-flowise-app.azurewebsites.net',
     cdnLink: 'https://cdn.jsdelivr.net/gh/714Lemons/FlowiseChatEmbed@demo/dist/web.js',
   },
