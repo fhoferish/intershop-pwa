@@ -145,7 +145,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
       if (this.locale === 'de_DE') {
         welcomeMessage = 'Willkommen! Wie kann ich Ihnen heute helfen?';
       } else if (this.locale === 'fr_FR') {
-        welcomeMessage = "Bienvenue! Comment puis-je vous aider aujourd'hui?";
+        welcomeMessage = 'Bienvenue! Comment puis-je vous aider aujourd`hui?';
       }
 
       script.text = `
