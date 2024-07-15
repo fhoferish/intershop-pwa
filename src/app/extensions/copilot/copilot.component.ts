@@ -47,14 +47,16 @@ export class CopilotComponent implements OnInit, OnDestroy {
     private shoppingFacade: ShoppingFacade
   ) {
     this.renderer = rendererFactory.createRenderer(undefined, undefined);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).handleToolCall = this.handleToolCall.bind(this); // Expose handleToolCall globally
   }
 
   ngOnInit(): void {
-    this.initializeCopilot();
-    this.copilotToolCall$ = this.copilotFacade.copilotToolCall$;
-    this.copilotFacade.setCopilotToolCall('product_search');
+    if (typeof window !== 'undefined') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).handleToolCall = this.handleToolCall.bind(this); // Expose handleToolCall globally
+      this.initializeCopilot();
+      this.copilotToolCall$ = this.copilotFacade.copilotToolCall$;
+      this.copilotFacade.setCopilotToolCall('product_search');
+    }
   }
 
   ngOnDestroy(): void {
