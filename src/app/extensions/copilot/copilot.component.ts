@@ -66,7 +66,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
   private async handleToolCall(toolCall: any) {
     switch (toolCall?.tool) {
       case 'product_search':
-        this.navigate(`/search/${toolCall?.toolInput?.Queries}`);
+        this.navigate(`/search/${toolCall?.toolInput?.Query}`);
         break;
       case 'product_detail_page':
         this.navigate(`/product/${toolCall?.toolInput?.SKU}`);
