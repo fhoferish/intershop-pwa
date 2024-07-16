@@ -88,6 +88,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
         this.ngZone.run(async () => {
           const skus = toolCall?.toolInput.Products.split(';');
           skus.forEach((sku: string) => {
+            console.log(skus);
             this.shoppingFacade.addProductToBasket(sku, 1);
           });
         });
@@ -152,7 +153,8 @@ export class CopilotComponent implements OnInit, OnDestroy {
 
       script.text = `
         (async () => {
-          const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
+          //const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
+          const { default: Chatbot } = await import("http://127.0.0.1:8000/dist/web.js");
           Chatbot.init({
             chatflowid: "${this.copilotSettings.chatflowid}",
             apiHost: "${this.copilotSettings.apiHost}",
@@ -188,8 +190,8 @@ export class CopilotComponent implements OnInit, OnDestroy {
                 },
                 textInput: {
                   sendButtonColor: '#688dc3',
-                  maxChars: 50,
-                  maxCharsWarningMessage: 'You exceeded the characters limit. Please input less than 50 characters.',
+                  maxChars: 200,
+                  maxCharsWarningMessage: 'You exceeded the characters limit. Please input less than 200 characters.',
                   autoFocus: true,
                 },
                 footer: {
