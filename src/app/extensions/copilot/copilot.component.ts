@@ -88,7 +88,6 @@ export class CopilotComponent implements OnInit, OnDestroy {
         this.ngZone.run(async () => {
           const skus = toolCall?.toolInput.Products.split(';');
           skus.forEach((sku: string) => {
-            console.log(skus);
             this.shoppingFacade.addProductToBasket(sku, 1);
           });
         });
