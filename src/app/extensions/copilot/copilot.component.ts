@@ -152,8 +152,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
 
       script.text = `
         (async () => {
-          //const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
-          const { default: Chatbot } = await import("http://127.0.0.1:8000/dist/web.js");
+          const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
           Chatbot.init({
             chatflowid: "${this.copilotSettings.chatflowid}",
             apiHost: "${this.copilotSettings.apiHost}",
