@@ -143,6 +143,7 @@ export interface Environment {
   priceUpdate: 'stable' | 'always';
 
   copilotConfig?: {
+    copilotTitle: string;
     chatflowid: string;
     apiHost: string;
     cdnLink: string;
@@ -223,8 +224,9 @@ export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
   priceUpdate: 'always',
 
   copilotConfig: {
+    copilotTitle: 'inSPIRED Assistant',
     chatflowid: '3ae443a9-b15f-4eca-a23c-8b496b7bbddf',
     apiHost: 'https://ish-flowise-app.azurewebsites.net',
-    cdnLink: 'https://cdn.jsdelivr.net/gh/714Lemons/FlowiseChatEmbed@demo/dist/web.js',
+    cdnLink: 'https://cdn.jsdelivr.net/gh/714Lemons/FlowiseChatEmbed@dev/dist/web.js',
   },
 };

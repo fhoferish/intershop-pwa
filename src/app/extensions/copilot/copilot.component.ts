@@ -150,6 +150,8 @@ export class CopilotComponent implements OnInit, OnDestroy {
         welcomeMessage = 'Bienvenue! Comment puis-je vous aider aujourd`hui?';
       }
 
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+
       script.text = `
         (async () => {
           const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
@@ -165,17 +167,17 @@ export class CopilotComponent implements OnInit, OnDestroy {
             },
             observersConfig: {
               observeToolCall: toolCall => {
-                window.handleToolCall(toolCall); // This will now work
+                window.handleToolCall(toolCall);
               },
             },
             theme: {
               button: {
-                backgroundColor: '#688dc3',
+                backgroundColor: "${primaryColor}",
               },
               chatWindow: {
                 showTitle: true,
                 showAgentMessages: true,
-                title: 'inSPIRED Assistant',
+                title: "${this.copilotSettings.copilotTitle}",
                 welcomeMessage: '${welcomeMessage}',
                 backgroundColor: '#f8f9fa',
                 height: 700,
@@ -184,17 +186,17 @@ export class CopilotComponent implements OnInit, OnDestroy {
                   backgroundColor: '#ffffff',
                 },
                 userMessage: {
-                  backgroundColor: '#688dc3',
+                  backgroundColor: '${primaryColor}',
                 },
                 textInput: {
-                  sendButtonColor: '#688dc3',
+                  sendButtonColor: '${primaryColor}',
                   maxChars: 200,
                   maxCharsWarningMessage: 'You exceeded the characters limit. Please input less than 200 characters.',
-                  autoFocus: true,
+                  autoFocus: false,
                 },
                 footer: {
                   textColor: '#303235',
-                  text: 'inSPIRED Assistant uses AI |',
+                  text: 'uses AI |',
                   company: 'Privacy Policy',
                   companyLink: 'https://intershop.com',
                 },
