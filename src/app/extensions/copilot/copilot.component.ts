@@ -176,7 +176,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
               },
               chatWindow: {
                 showTitle: true,
-                showAgentMessages: true,
+                showAgentMessages: false,
                 title: "${this.copilotSettings.copilotTitle}",
                 welcomeMessage: '${welcomeMessage}',
                 backgroundColor: '#f8f9fa',
