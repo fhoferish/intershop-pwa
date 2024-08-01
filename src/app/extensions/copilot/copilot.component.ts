@@ -150,7 +150,11 @@ export class CopilotComponent implements OnInit, OnDestroy {
         welcomeMessage = 'Bienvenue! Comment puis-je vous aider aujourd`hui?';
       }
 
-      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+      let primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+
+      if (primaryColor === '') {
+        primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+      }
 
       script.text = `
         (async () => {
