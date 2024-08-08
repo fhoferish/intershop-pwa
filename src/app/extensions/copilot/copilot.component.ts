@@ -156,6 +156,9 @@ export class CopilotComponent implements OnInit, OnDestroy {
         primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
       }
 
+      const prefix = 'icm_';
+      const token = localStorage.getItem(`${prefix}access_token`);
+
       script.text = `
         (async () => {
           const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
@@ -167,6 +170,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
                 customer: ${JSON.stringify(customer)},
                 restEndpoint: "${restEndpoint}",
                 locale: "${this.locale}",
+                user_token: "${token}",
               },
             },
             observersConfig: {
