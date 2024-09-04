@@ -10,7 +10,7 @@ import { AppFacade } from 'ish-core/facades/app.facade';
 import { CostCenterBuyer } from 'ish-core/models/cost-center/cost-center.model';
 import { HttpError } from 'ish-core/models/http-error/http-error.model';
 import { PriceHelper } from 'ish-core/models/price/price.model';
-import { markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
+import { focusFirstInvalidField, markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
 import { FormsService } from 'ish-shared/forms/utils/forms.service';
 
 import { OrganizationManagementFacade } from '../../facades/organization-management.facade';
@@ -161,6 +161,7 @@ export class CostCenterBuyersPageComponent implements OnInit {
     if (this.form.invalid) {
       this.submitted = true;
       markAsDirtyRecursive(this.form);
+      focusFirstInvalidField(this.form);
       return;
     }
     const buyers: CostCenterBuyer[] = this.model.addBuyers

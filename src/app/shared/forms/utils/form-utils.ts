@@ -35,3 +35,34 @@ export function ariaDescribedByIds(id: string, showError: boolean, customDescrip
 
   return describedByIds || undefined;
 }
+
+/**
+ * Set focus on the first invalid field in a form.
+ *
+ * @param form The form group to check for invalid fields.
+ */
+export function focusFirstInvalidField(form: FormGroup) {
+  for (const key of Object.keys(form.controls)) {
+    const control = form.get(key);
+
+    if (control && control.invalid) {
+      if (control instanceof FormGroup) {
+        // recursively check nested FormGroup
+        focusFirstInvalidField(control);
+      } else {
+        const element = document.querySelector(`[id^='formly_'][id*='${key}']`);
+
+        if (
+          element &&
+          (element instanceof HTMLInputElement ||
+            element instanceof HTMLSelectElement ||
+            element instanceof HTMLTextAreaElement)
+        ) {
+          (element as HTMLElement).focus();
+          // break after the first element is focused
+          break;
+        }
+      }
+    }
+  }
+}

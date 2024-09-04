@@ -12,7 +12,7 @@ import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
 import { HttpError } from 'ish-core/models/http-error/http-error.model';
-import { markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
+import { focusFirstInvalidField, markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
 import { SpecialValidators } from 'ish-shared/forms/validators/special-validators';
 
 /**
@@ -110,6 +110,7 @@ export class AccountProfilePasswordComponent implements OnInit, OnChanges {
     if (this.accountProfilePasswordForm.invalid) {
       this.submitted = true;
       markAsDirtyRecursive(this.accountProfilePasswordForm);
+      focusFirstInvalidField(this.accountProfilePasswordForm);
       return;
     }
 

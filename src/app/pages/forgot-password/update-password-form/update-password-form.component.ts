@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from
 import { FormGroup } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 
-import { markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
+import { focusFirstInvalidField, markAsDirtyRecursive } from 'ish-shared/forms/utils/form-utils';
 import { SpecialValidators } from 'ish-shared/forms/validators/special-validators';
 
 /**
@@ -79,6 +79,7 @@ export class UpdatePasswordFormComponent implements OnInit {
     if (this.updatePasswordForm.invalid) {
       this.submitted = true;
       markAsDirtyRecursive(this.updatePasswordForm);
+      focusFirstInvalidField(this.updatePasswordForm);
       return;
     }
 
