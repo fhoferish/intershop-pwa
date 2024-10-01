@@ -68,7 +68,32 @@ export class CopilotComponent implements OnInit, OnDestroy {
   private async handleToolCall(toolCall: any) {
     switch (toolCall?.tool) {
       case 'product_search':
-        this.navigate(`/search/${toolCall?.toolInput?.Query}`);
+        let url = `/search/${toolCall?.toolInput?.Query}`;
+        const filters = [];
+
+        // Add Volume filter with both minimum (gte) and maximum (lte)
+        let volumeFilter = `Volume-%28L%29%5Bgte%5D%3D0`;
+        if (toolCall?.toolInput?.FilterVolumeMax > 0) {
+          volumeFilter += `%26Volume-%28L%29%5Blte%5D%3D${toolCall.toolInput.FilterVolumeMax}`;
+          filters.push(volumeFilter);
+        }
+
+        // Add CO2 filter with both minimum (gte) and maximum (lte)
+        let co2Filter = `Co2-%28gr%29%5Bgte%5D%3D0`;
+
+        if (toolCall?.toolInput?.FilterCoMax > 0) {
+          co2Filter += `%26Co2-%28gr%29%5Blte%5D%3D${toolCall.toolInput.FilterCoMax}`;
+          filters.push(co2Filter);
+        }
+
+        // If there are any filters, add them to the URL
+        if (filters.length > 0) {
+          url += `?filters=${filters.join('%26')}&sorting=Volume-%28L%29-desc&page=1`;
+        } else {
+          url += `?page=1`; // Ensure page=1 is added if no filters are applied
+        }
+
+        this.navigate(url);
         break;
       case 'product_detail_page':
         this.navigate(`/product/${toolCall?.toolInput?.SKU}`);
@@ -150,7 +175,11 @@ export class CopilotComponent implements OnInit, OnDestroy {
         welcomeMessage = 'Bienvenue! Comment puis-je vous aider aujourd`hui?';
       }
 
-      let primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+      let primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-copilot').trim();
+
+      if (primaryColor === '') {
+        primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim();
+      }
 
       if (primaryColor === '') {
         primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
@@ -162,6 +191,9 @@ export class CopilotComponent implements OnInit, OnDestroy {
       script.text = `
         (async () => {
           const { default: Chatbot } = await import("${this.copilotSettings.cdnLink}");
+          let latestMessages = [];
+          let previousLoading = false; // Assuming initial loading state is false
+
           Chatbot.init({
             chatflowid: "${this.copilotSettings.chatflowid}",
             apiHost: "${this.copilotSettings.apiHost}",
@@ -177,10 +209,61 @@ export class CopilotComponent implements OnInit, OnDestroy {
               observeToolCall: toolCall => {
                 window.handleToolCall(toolCall);
               },
+              observeUserInput: (userInput) => {
+                console.log({ userInput });
+              },
+              // The bot message stack has changed
+              observeMessages: (messages) => {
+                  console.log({ messages });
+
+                  // Update the latestMessages with the new messages
+                  latestMessages = messages;
+              },
+              // The bot loading signal changed
+              observeLoading: (loading) => {
+                  console.log({ loading });
+
+                  // Detect transition from true to false
+                  if (previousLoading && !loading) {
+                    // Ensure there are messages to process
+                    if (!latestMessages || latestMessages.length === 0) {
+                      console.warn('No messages available to process.');
+                      return;
+                    }
+
+                    // Get the last message in the array
+                    const lastMessage = latestMessages[latestMessages.length - 1];
+
+                    // Check if the last message has a messageId
+                    if (lastMessage.messageId) {
+                      // Ensure usedTools exists and has at least one tool
+                      if (lastMessage.usedTools && lastMessage.usedTools.length > 0) {
+                        // Extract the last tool from the usedTools array
+                        const lastTool = lastMessage.usedTools[lastMessage.usedTools.length - 1];
+
+                        // Check if the lastTool has the necessary structure
+                        if (lastTool) {
+                          // Call the handleToolCall function with the last tool
+                          window.handleToolCall(lastTool);
+                        } else {
+                          console.warn('Last tool does not have the expected structure:', lastTool);
+                        }
+                      } else {
+                        // console.warn('No tools found in the last message:', lastMessage);
+                      }
+                    } else {
+                      // console.warn('Last message does not contain a messageId:', lastMessage);
+                    }
+                  }
+
+                  // Update previousLoading for the next change
+                  previousLoading = loading;
+                },
             },
             theme: {
               button: {
                 backgroundColor: "${primaryColor}",
+                dragAndDrop: true,
               },
               chatWindow: {
                 showTitle: true,
@@ -189,7 +272,8 @@ export class CopilotComponent implements OnInit, OnDestroy {
                 welcomeMessage: '${welcomeMessage}',
                 backgroundColor: '#f8f9fa',
                 height: 700,
-                fontSize: 13,
+                fontSize: '0.875rem',
+                starterPrompts: ['What can you do for me?', 'Who are you?'],
                 botMessage: {
                   backgroundColor: '#ffffff',
                 },
@@ -208,6 +292,10 @@ export class CopilotComponent implements OnInit, OnDestroy {
                   company: 'Privacy Policy',
                   companyLink: 'https://intershop.com',
                 },
+              },
+              disclaimer: {
+                title: 'Disclaimer',
+                message: 'By using this chatbot, you agree to the <a target="_blank" href="https://flowiseai.com/terms">Terms & Condition</a>',
               },
             },
           });
