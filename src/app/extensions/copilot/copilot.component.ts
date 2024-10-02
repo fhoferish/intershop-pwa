@@ -68,32 +68,7 @@ export class CopilotComponent implements OnInit, OnDestroy {
   private async handleToolCall(toolCall: any) {
     switch (toolCall?.tool) {
       case 'product_search':
-        let url = `/search/${toolCall?.toolInput?.Query}`;
-        const filters = [];
-
-        // Add Volume filter with both minimum (gte) and maximum (lte)
-        let volumeFilter = `Volume-%28L%29%5Bgte%5D%3D0`;
-        if (toolCall?.toolInput?.FilterVolumeMax > 0) {
-          volumeFilter += `%26Volume-%28L%29%5Blte%5D%3D${toolCall.toolInput.FilterVolumeMax}`;
-          filters.push(volumeFilter);
-        }
-
-        // Add CO2 filter with both minimum (gte) and maximum (lte)
-        let co2Filter = `Co2-%28gr%29%5Bgte%5D%3D0`;
-
-        if (toolCall?.toolInput?.FilterCoMax > 0) {
-          co2Filter += `%26Co2-%28gr%29%5Blte%5D%3D${toolCall.toolInput.FilterCoMax}`;
-          filters.push(co2Filter);
-        }
-
-        // If there are any filters, add them to the URL
-        if (filters.length > 0) {
-          url += `?filters=${filters.join('%26')}&sorting=Volume-%28L%29-desc&page=1`;
-        } else {
-          url += `?page=1`; // Ensure page=1 is added if no filters are applied
-        }
-
-        this.navigate(url);
+        this.navigate(`/search/${toolCall?.toolInput?.Query}`);
         break;
       case 'product_detail_page':
         this.navigate(`/product/${toolCall?.toolInput?.SKU}`);
